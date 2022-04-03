@@ -69,25 +69,6 @@ export function drawContent() {
         .attr("transform", d => labelTransform(d.current))
         .text(d => d.current.data.data.key);
 
-    /*
-        const labeldebug = this.g.append("g")
-            .attr("pointer-events", "none")
-            .attr("text-anchor", "middle")
-            .attr("dominant-baseline", "middle")
-            .style("user-select", "none")
-            .selectAll("rect")
-            .data(root.descendants().slice(1))
-            .join("rect")
-            .attr("x", d => -(d.y1 - 1 - d.y0)/2)
-            .attr("y", d => -((d.x1 - d.x0)*d.radius)/2)
-            .attr("transform", d => labelTransform(d.current))
-            .attr("fill-opacity", d => -1+labelVisible(d.current))
-            .attr('width', d => d.y1 - d.y0)
-            .attr('height', d => (d.x1 - d.x0) *d.radius)
-            .attr('stroke', 'black')
-            .attr('fill', '#69a');
-            */
-
     this.clickHistory = this.locStorage.state.clickHistory;
     const len = this.clickHistory.length;
     if (len > 0) {
