@@ -8,8 +8,8 @@
                 "metric": [18.666666666666668]
             },
             { "dimension": ["Asia", "Kyrgyzstan"], "metric": [17] },
-            { "dimension": ["Americas", "Belize"], "metric": [17] },
-            { "dimension": ["Americas", "The Great Bermuda Republic"], "metric": [14] },
+            { "dimension": ["Americas", "Belize",""], "metric": [17] },
+            { "dimension": ["Americas", "Bermuda","Capitol"], "metric": [14] },
             {
                 "dimension": ["Africa", "Angola"],
                 "metric": [12.333333333333334]
@@ -455,6 +455,12 @@
                 "name": "Country",
                 "type": "COUNTRY",
                 "concept": "DIMENSION"
+            },
+            {
+                "id": "qt_ciqox7ozzb",
+                "name": "City",
+                "type": "CITY",
+                "concept": "DIMENSION"
             }
         ],
         "metric": [
@@ -477,7 +483,6 @@
             "value": "interpolateInferno",
             "defaultValue": "interpolateViridis"
         },
-        "isLabeled": { "value": false, "defaultValue": false },
         "colorSchemeReversed": { "value": false, "defaultValue": false }
     },
     "theme": {

@@ -57,6 +57,18 @@
             ]
         },
         {
+            "id": "labels",
+            "label": "Labels",
+            "elements": [
+                {
+                    "id": "islabeled",
+                    "label": "Show Labels",
+                    "type": "CHECKBOX",
+                    "defaultValue": "true"
+                }
+            ]
+        },
+        {
             "id": "colors",
             "label": "Colour Scheme",
             "elements": [

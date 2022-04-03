@@ -56,6 +56,38 @@ export function drawContent() {
             }
         });
 
+    const label = this.g.append("g")
+        .attr("pointer-events", "none")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .style("user-select", "none")
+        .selectAll("text")
+        .data(root.descendants().slice(1))
+        .join("text")
+        .attr("class", "label")
+        .attr("fill-opacity", d => +(ctx.isLabeled && labelVisible(d.current)))
+        .attr("transform", d => labelTransform(d.current))
+        .text(d => d.current.data.data.key);
+
+    /*
+        const labeldebug = this.g.append("g")
+            .attr("pointer-events", "none")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .style("user-select", "none")
+            .selectAll("rect")
+            .data(root.descendants().slice(1))
+            .join("rect")
+            .attr("x", d => -(d.y1 - 1 - d.y0)/2)
+            .attr("y", d => -((d.x1 - d.x0)*d.radius)/2)
+            .attr("transform", d => labelTransform(d.current))
+            .attr("fill-opacity", d => -1+labelVisible(d.current))
+            .attr('width', d => d.y1 - d.y0)
+            .attr('height', d => (d.x1 - d.x0) *d.radius)
+            .attr('stroke', 'black')
+            .attr('fill', '#69a');
+            */
+
     this.clickHistory = this.locStorage.state.clickHistory;
     const len = this.clickHistory.length;
     if (len > 0) {
@@ -133,6 +165,7 @@ export function drawContent() {
             };
             d.newAngle = d.target.x1 - (d.target.x1 - d.target.x0) / 2;
             d.newRadius = d.target.y1 - (d.target.y1 - d.target.y0) / 2;
+            d.target.radius = d.newRadius;
         });
 
         const t = ctx.g.transition().duration(10);
@@ -149,7 +182,16 @@ export function drawContent() {
             .attrTween("d", d => () => ctx.arc(d.current));
 
         // REBUILD LEGEND
-        ctx.buildLegend(target, target.depth);        
+        ctx.buildLegend(target, target.depth);
+
+        label.filter(function (d) {
+            return +this.getAttribute("fill-opacity") || labelVisible(d.target, d.data.data.key);
+        }).transition(t)
+            .attr("fill-opacity",
+                d => +labelVisible(d.target, d.data.data.key))
+            .attrTween("transform", d => () =>
+                (d.data.data.key == target.data.data.key) ? `` : labelTransform(d.current));
+
     }
 
     // #### TOOLTIP ####
@@ -206,8 +248,8 @@ export function drawContent() {
             .style(
                 "transform",
                 `translate(${x - ctx.horizontalOffset - w / 2}px, ${y -
-                    h -
-                    10}px)`
+                h -
+                10}px)`
             );
 
         // TOOLTIP LINE + DOT
@@ -251,6 +293,34 @@ export function drawContent() {
         filterValues.push(valueArray.slice(0, level));
 
         ctx.filterDashbord(filterConcepts, filterValues);
+    }
+
+    function labelVisible(d, label = d.data.data.key) {
+
+        var size = textSize(label)
+        //Math.sqrt((d.y1 - d.y0)**2 + (d.x1 - d.x0)**2) 
+        return (d.x1 - d.x0) * d.radius > (size.height) && (d.y1 - d.y0 - 1) > size.width;
+    }
+
+
+    function labelTransform(d) {
+        let angle = d.angle;
+        let radius = d.radius;
+
+        const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+        const y = (d.y0 + d.y1) / 2 //* ctx.dimensions.tooltipRadius);
+        return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
+    }
+    function textSize(someText) {
+        if (!d3) return;
+        var container = d3.select('body').append('svg');
+        container.append('text')
+            .attr("fill-opacity", 0)
+            .attr("class", "label")
+            .text(someText);
+        var size = container.node().getBBox();
+        container.remove();
+        return { width: size.width, height: size.height };
     }
 }
 

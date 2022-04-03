@@ -66,6 +66,9 @@ function drawViz(rawData) {
         // Draw Legend
         sunburst.legend = Helper.getStyleValue(data.style, "isLegend");
 
+        //Draw Labels
+        sunburst.isLabeled = Helper.getStyleValue(data.style, "isLabeled");
+
         // #### Filtering ####
 
         // Dimensions ID
