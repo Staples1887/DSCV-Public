@@ -168,10 +168,8 @@ export function drawContent() {
         label.filter(function (d) {
             return +this.getAttribute("fill-opacity") || labelVisible(d.target, d.data.data.key);
         }).transition(t)
-            .attr("fill-opacity",
-                d => +labelVisible(d.target, d.data.data.key))
-            .attrTween("transform", d => () =>
-                (d.data.data.key == target.data.data.key) ? `` : labelTransform(d.current));
+            .attr("fill-opacity", d => +labelVisible(d.target, d.data.data.key))
+            .attrTween("transform", d => () => (d.data.data.key == target.data.data.key) ? `` : labelTransform(d.current));
 
     }
 
@@ -278,8 +276,7 @@ export function drawContent() {
 
     function labelVisible(d, label = d.data.data.key) {
 
-        var size = textSize(label)
-        //Math.sqrt((d.y1 - d.y0)**2 + (d.x1 - d.x0)**2) 
+        var size = textSize(label);
         return (d.x1 - d.x0) * d.radius > (size.height) && (d.y1 - d.y0 - 1) > size.width;
     }
 
@@ -289,7 +286,7 @@ export function drawContent() {
         let radius = d.radius;
 
         const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
-        const y = (d.y0 + d.y1) / 2 //* ctx.dimensions.tooltipRadius);
+        const y = (d.y0 + d.y1) / 2;
         return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
     }
     function textSize(someText) {

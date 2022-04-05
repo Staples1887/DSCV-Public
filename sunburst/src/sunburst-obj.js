@@ -40,6 +40,7 @@ export default class Sunburst {
         this.fontColor = "slateGrey";
         this.fontOpacity = 1;
         this.legend = true;
+        this.isLabeled = false;
         this.colorSchemeReversed = false;
         this.horizontalOffset = 0;
 
