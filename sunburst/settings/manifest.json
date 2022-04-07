@@ -7,7 +7,7 @@
   "supportUrl": "https://twitter.com/ralph_spandl",
   "privacyPolicyUrl": "http://www.r42.ca/en/Data-Studio-Community-Visualization-Privacy-Policy",
   "packageUrl": "https://datastudio.google.com/reporting/1p06tzmnFLNbY92hC2HjYWmjPRmpBI-gK/page/mNHw",
-  "devMode": false,
+  "devMode": true,
   "components": [
       {
           "id": "sunburst_v1",

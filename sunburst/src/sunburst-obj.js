@@ -55,17 +55,17 @@ export default class Sunburst {
     }
 
     init() {
-        this.localStorageId = `d3_sunburst_v1.0${this.instanceID}`;
+        //this.localStorageId = `d3_sunburst_v1.0${this.instanceID}`;
         this.dimensions = this.getDimensions(this.DOMtarget);
 
-        if (localStorage.getItem(this.localStorageId) === null) {
+//         if (localStorage.getItem(this.localStorageId) === null) {
 
             // set complete ocal storage object
             this.locStorage = {};
             this.locStorage.state = {};
             this.locStorage.state.clickHistory = [];
 
-            window.localStorage.setItem(
+/*            window.localStorage.setItem(
                 this.localStorageId,
                 JSON.stringify(this.locStorage)
             );
@@ -78,7 +78,7 @@ export default class Sunburst {
             if (this.isFilterData == false) {
                 Helper.saveLocStorage(this, "clickHistory", []);
             }
-        }
+        } */
 
         this.treeData = this.prepareData();
         this.initScales();

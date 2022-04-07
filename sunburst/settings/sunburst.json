@@ -61,7 +61,7 @@
             "label": "Labels",
             "elements": [
                 {
-                    "id": "islabeled",
+                    "id": "isLabeled",
                     "label": "Show Labels",
                     "type": "CHECKBOX",
                     "defaultValue": "true"

@@ -23,6 +23,7 @@ export function drawContent() {
 
     const paths = this.g
         .append("g")
+        .attr('transform', "rotate(90)" )
         .attr("fill-opacity", 0.8)
         .selectAll("path")
         .data(root.descendants())
@@ -100,7 +101,7 @@ export function drawContent() {
             : ctx.clickHistory.pop();
 
         // Write click history to local storage
-        Helper.saveLocStorage(ctx, "clickHistory", ctx.clickHistory);
+        //Helper.saveLocStorage(ctx, "clickHistory", ctx.clickHistory);
     }
 
     // ########################
@@ -121,26 +122,8 @@ export function drawContent() {
 
         root.each(d => {
             d.target = {
-                x0:
-                    Math.max(
-                        0,
-                        Math.min(
-                            1,
-                            (d.x0 - target.x0) / (target.x1 - target.x0)
-                        )
-                    ) *
-                    2 *
-                    Math.PI,
-                x1:
-                    Math.max(
-                        0,
-                        Math.min(
-                            1,
-                            (d.x1 - target.x0) / (target.x1 - target.x0)
-                        )
-                    ) *
-                    2 *
-                    Math.PI,
+                x0: Math.max(0, Math.min(1, (d.x0 - target.x0) / (target.x1 - target.x0))) * 2 * Math.PI,
+                x1: Math.max(0, Math.min(1, (d.x1 - target.x0) / (target.x1 - target.x0))) * 2 * Math.PI,
                 y0: Math.max(0, d.y0 - target.y0),
                 y1: Math.max(0, d.y1 - target.y0)
             };
@@ -165,12 +148,14 @@ export function drawContent() {
         // REBUILD LEGEND
         ctx.buildLegend(target, target.depth);
 
+        // Rebuild Labels
         label.filter(function (d) {
+            console.log(`${d.data.data.key} = ${target.data.data.key}, ${labelTransform(d.target)}`);
             return +this.getAttribute("fill-opacity") || labelVisible(d.target, d.data.data.key);
-        }).transition(t)
+        }).transition().duration(ctx.AnimDuration)
+            .style("text-shadow", "#000 0px 0px 0.3em;")
             .attr("fill-opacity", d => +labelVisible(d.target, d.data.data.key))
-            .attrTween("transform", d => () => (d.data.data.key == target.data.data.key) ? `` : labelTransform(d.current));
-
+            .attrTween("transform", d => () => labelTransform(d.current))
     }
 
     // #### TOOLTIP ####
@@ -183,7 +168,7 @@ export function drawContent() {
             angle = d.newAngle;
             radius = d.newRadius;
         }
-
+        angle +=(90 * Math.PI /180)
         const tooltip = d3
             .select("#tooltip")
             .style("max-width", `${ctx.dimensions.boundedRadius}px`);
@@ -282,12 +267,10 @@ export function drawContent() {
 
 
     function labelTransform(d) {
-        let angle = d.angle;
-        let radius = d.radius;
 
-        const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+        const x = ((d.x0 + d.x1) / 2 * 180 / Math.PI) + 90;
         const y = (d.y0 + d.y1) / 2;
-        return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
+        return `rotate(${x - 90}) translate(${y},0) rotate(${x > 180 && x < 360 ? 180 : 0})`;
     }
     function textSize(someText) {
         if (!d3) return;

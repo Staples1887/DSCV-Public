@@ -21,28 +21,41 @@ const minSize = 300;
 */
 
 function drawViz(rawData) {
+    console.log("Here's your rawData:");
     console.log(JSON.stringify(rawData))
+    
     // First Error check: component size
+    console.log("Preparing DOM:");
     prepareDOM();
+
+    console.log("Checking Size:");
     const dim = Helper.getMaxDimensions("body");
     if (dim.max < minSize) {
         renderErrorMessage(msg.resizeTitle, msg.sizeError);
         return;
     }
 
+    console.log("converting data:");
     const data = convertData(rawData);
     if (data) {
+        console.log("We have Data!");
         const root = prepareDOM();
+
+        console.log("Preparing Tooltip:");
         createTooltip(root);
+
+        console.log("Creating sunburst object:");
         const sunburst = new Sunburst("body", data.tables);
 
         // Dimensions and Metric of viz
+        console.log("Getting Dimentions");
         sunburst.metricAccessor = rawData.fields.metric[0].name;
         sunburst.dimensionsAccessor = [];
         rawData.fields.dimension.forEach((d, i) => {
             sunburst.dimensionsAccessor[i] = d.name;
         });
 
+        console.log("Getting Styles");
         // Instance ID for multiple usage in same report
         sunburst.instanceID = Helper.getStyleValue(data.style, "instanceID");
 
@@ -67,10 +80,12 @@ function drawViz(rawData) {
         sunburst.legend = Helper.getStyleValue(data.style, "isLegend");
 
         //Draw Labels
+        console.log("Getting islabeled");
+        
         sunburst.isLabeled = Helper.getStyleValue(data.style, "isLabeled");
 
         // #### Filtering ####
-
+        console.log("Filtering");
         // Dimensions ID
         sunburst.dimensionsAccessorId = [];
         rawData.fields.dimension.forEach((d, i) => {
@@ -88,10 +103,10 @@ function drawViz(rawData) {
         const isFilterData = data.interactions[interactionId].value.data;
         if (isFilterData === "undefined" || typeof isFilterData === "undefined") {
             sunburst.isFilterData = false;
-            
+
         } else {
             sunburst.isFilterData = true;
-            
+
         }
 
         const filterEnabled = data.interactions[interactionId].value.type;
@@ -102,7 +117,7 @@ function drawViz(rawData) {
             sunburst.filterEnabled = true;
             sunburst.AnimDuration = 0;
         }
-
+        console.log("Drawing!");
         // Draw the visualization
         sunburst.draw();
     } else {
@@ -177,7 +192,7 @@ function convertData(dsObj) {
 
 /* try catch only for DS */
 function draw(data) {
-    if (LOCAL) {
+    if (window.location.hostname == LOCAL) {
         window.addEventListener("resize", executeDebounced);
         drawViz(data);
     } else {
@@ -192,9 +207,21 @@ function draw(data) {
 /* Load data (LOCAL) or take from Google DS */
 async function sunburst() {
     if (window.location.hostname == LOCAL) {
+        console.log("This is ment to be local right?");
         const theDataSet = await d3.json("./data/DS-data-documentation.json");
         draw(theDataSet);
     } else {
+        // define and use a callback
+        var unsubscribe = dscc.subscribeToData(function (data) {
+            // console.log the returned data
+            console.log("Hi there here is the data:");
+            console.log(data);
+        }, { transform: dscc.tableTransform });
+
+        // to unsubscribe
+
+        unsubscribe();
+
         dscc.subscribeToData(draw, { transform: dscc.objectTransform });
     }
 }
@@ -203,7 +230,7 @@ async function sunburst() {
 const executeDebounced = _.debounce(sunburst, 600, {
     'leading': true,
     'trailing': true
-  });
+});
 executeDebounced();
 
 // ** ERROR HANDLING **
