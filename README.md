@@ -25,6 +25,7 @@ Source code for sunburst diagram with drill-down option.
 
 * npm run dev
 * npm run build
+* gsutil cp dist\sunburst gs://dscv-staples-sunburst
 
 ### Prettier
 

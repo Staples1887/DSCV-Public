@@ -477,7 +477,7 @@
             "value": "interpolateInferno",
             "defaultValue": "interpolateViridis"
         },
-        "isLabeled": { "value": false, "defaultValue": false },
+        "isLabeled": { "value": true, "defaultValue": true },
         "colorSchemeReversed": { "value": false, "defaultValue": false }
     },
     "theme": {
