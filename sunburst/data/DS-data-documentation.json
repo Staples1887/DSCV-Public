@@ -478,6 +478,7 @@
             "defaultValue": "interpolateViridis"
         },
         "isLabeled": { "value": true, "defaultValue": true },
+        "labelSize": { "value": 24, "defaultValue": 12 },
         "colorSchemeReversed": { "value": false, "defaultValue": false }
     },
     "theme": {

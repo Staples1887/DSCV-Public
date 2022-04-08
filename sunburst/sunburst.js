@@ -83,6 +83,7 @@ function drawViz(rawData) {
         console.log("Getting islabeled");
         
         sunburst.isLabeled = Helper.getStyleValue(data.style, "isLabeled");
+        sunburst.labelSize = Helper.getStyleValue(data.style, "labelSize");
 
         // #### Filtering ####
         console.log("Filtering");

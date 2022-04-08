@@ -65,6 +65,12 @@
                     "label": "Show Labels",
                     "type": "CHECKBOX",
                     "defaultValue": "true"
+                },
+                {
+                    "id": "labelSize",
+                    "label": "Label Size",
+                    "type": "FONT_SIZE",
+                    "defaultValue": "10"
                 }
             ]
         },

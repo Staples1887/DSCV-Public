@@ -41,6 +41,7 @@ export default class Sunburst {
         this.fontOpacity = 1;
         this.legend = true;
         this.isLabeled = false;
+        this.labelSize = "12";
         this.colorSchemeReversed = false;
         this.horizontalOffset = 0;
 
