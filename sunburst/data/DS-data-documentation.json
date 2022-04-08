@@ -1,7 +1,7 @@
 {
     "tables": {
         "DEFAULT": [
-            { "dimension": ["Americas", "Grenada"], "metric": [44] },
+            { "dimension": ["Americas", "Grenada Grander"], "metric": [44] },
             { "dimension": ["Europe", "Albania"], "metric": [21.4] },
             {
                 "dimension": ["Americas", "Barbados"],

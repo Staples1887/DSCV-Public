@@ -23,7 +23,7 @@ export function drawContent() {
 
     const paths = this.g
         .append("g")
-        .attr('transform', "rotate(90)" )
+        //.attr('transform', "rotate(90)")
         .attr("fill-opacity", 0.8)
         .selectAll("path")
         .data(root.descendants())
@@ -36,7 +36,8 @@ export function drawContent() {
         .attr("fill-opacity", d => (d.children ? 0.6 : 0.4))
         .attr("d", this.arc)
         .attr("data-test", d => d.data.id)
-        .attr("id", (d, i) => `cp-${i}`)
+        .attr("id", (d, i) =>
+            `cp-${d.data.id}`)
         .on("mouseover", (d, i, node) => {
             showTooltip(d, i, node);
         })
@@ -47,29 +48,59 @@ export function drawContent() {
         .style("cursor", "pointer")
         .on("click", d => {
             // will update local storage
+            console.log(`Managing State: ${d}`)
             manageState(d);
+            console.log(`Managed State: ${d}`)
             if (ctx.filterEnabled == false) {
+                console.log(`No Filter: ${d}`)
                 // enabled filter will refresh the viz
                 changeRoot(d, 0);
             } else {
+                console.log(`Filtered: ${d}`)
                 const target = getTarget(ctx, d);
                 callFilter(target, target.depth);
             }
         });
 
+    const clipPaths = this.g.append('defs')
+        .attr("pointer-events", "none")
+        //.attr('transform', "rotate(90)")
+        .selectAll("clipPath")
+        .data(root.descendants())
+        .enter().append('svg:clipPath')
+        .attr('id', function (d, i) { console.log(`Clip Path: ${d.data.id} = ${d.data.data.key}`)
+            return d.data.id; })
+        .append('path').attr('d', this.arc);
+
+/*     const group =
+        this.g.selectAll("g")
+            .data(root.descendants())
+            .enter().append('svg:g')
+            .attr('clip-path', function (d, i) { console.log(`Clip Group: ${d.data.id} = ${d.data.data.key}`)
+                return 'url(#' + d.data.id + ')'; }); */
+
     const label = this.g.append("g")
+        .attr("id", "labels")
         .attr("pointer-events", "none")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
         .style("user-select", "none")
+        
         .selectAll("text")
         .data(root.descendants().slice(1))
-        .join("text")
+        .enter().append("g").attr('clip-path', function (d, i) { console.log(`Clip Group: ${d.data.id} = ${d.data.data.key}`)
+        return 'url(#' + d.data.id + ')'; })
+        
+        .append("text")
         .attr("class", "label")
         .attr("fill-opacity", d => +(ctx.isLabeled && labelVisible(d.current)))
         .attr("transform", d => labelTransform(d.current))
-        .text(d => d.current.data.data.key);
-
+        .text(d => d.current.data.data.key)
+        
+    
+    
+        //.attr('clip-path', d => `url(#${d.data.id})`)
+    //(d, i) => `cp-${i}`
     this.clickHistory = this.locStorage.state.clickHistory;
     const len = this.clickHistory.length;
     if (len > 0) {
@@ -109,18 +140,23 @@ export function drawContent() {
 
     function getTarget(obj, target) {
         // target is always the last element of the click history otherwise the root
+        console.log(`click history length`)
         if (obj.clickHistory.length > 0) {
+            
             const targetArray = obj.clickHistory[obj.clickHistory.length - 1];
+            console.log(`target array: ${targetArray}`)
             return obj.getNodeFromFunnel(targetArray);
         } else {
+            console.log(`Root: ${root}`)
             return root;
         }
     }
     function changeRoot(p, reload) {
 
         const target = getTarget(ctx, p);
-
+        console.log(`Target: ${target}`);
         root.each(d => {
+            console.log(`Target: [${target.x0}, ${target.x1}] [${target.y0}, ${target.y1}] Data: ${d.data.data.key}`);
             d.target = {
                 x0: Math.max(0, Math.min(1, (d.x0 - target.x0) / (target.x1 - target.x0))) * 2 * Math.PI,
                 x1: Math.max(0, Math.min(1, (d.x1 - target.x0) / (target.x1 - target.x0))) * 2 * Math.PI,
@@ -144,18 +180,22 @@ export function drawContent() {
                 return t => (d.current = i(t));
             })
             .attrTween("d", d => () => ctx.arc(d.current));
+        
+        clipPaths
+            .transition().duration(ctx.AnimDuration)
+            .attrTween("d", d => () => ctx.arc(d.current));
 
         // REBUILD LEGEND
         ctx.buildLegend(target, target.depth);
 
         // Rebuild Labels
         label.filter(function (d) {
-            console.log(`${d.data.data.key} = ${target.data.data.key}, ${labelTransform(d.target)}`);
+            //console.log(`${d.data.data.key} = ${target.data.data.key}, ${this} `);
             return +this.getAttribute("fill-opacity") || labelVisible(d.target, d.data.data.key);
-        }).transition().duration(ctx.AnimDuration)
-            .style("text-shadow", "#000 0px 0px 0.3em;")
+        })
+            .transition().duration(ctx.AnimDuration)
             .attr("fill-opacity", d => +labelVisible(d.target, d.data.data.key))
-            .attrTween("transform", d => () => labelTransform(d.current))
+            .attrTween("transform", d => () => labelTransform(d.current, d.data.data.key))
     }
 
     // #### TOOLTIP ####
@@ -168,7 +208,7 @@ export function drawContent() {
             angle = d.newAngle;
             radius = d.newRadius;
         }
-        angle +=(90 * Math.PI /180)
+        //angle += (90 * Math.PI / 180)
         const tooltip = d3
             .select("#tooltip")
             .style("max-width", `${ctx.dimensions.boundedRadius}px`);
@@ -260,17 +300,23 @@ export function drawContent() {
     }
 
     function labelVisible(d, label = d.data.data.key) {
-
+        console.log(`LV: Finding Size of ${label}`)
         var size = textSize(label);
-        return (d.x1 - d.x0) * d.radius > (size.height) && (d.y1 - d.y0 - 1) > size.width;
+        console.log(`Checking ${size.height} against path height ${(d.x1 - d.x0) * d.radius} `)
+        return (d.x1 - d.x0) * d.radius > (size.height);// && (d.y1 - d.y0 - 1) > size.width;
     }
 
 
-    function labelTransform(d) {
-
-        const x = ((d.x0 + d.x1) / 2 * 180 / Math.PI) + 90;
+    function labelTransform(d, label = d.data.data.key) {
+        console.log(`LT: Finding Size of ${label}`)
+        const size = textSize(label)
+        console.log(`LT: Finding x y of ${label}`)
+        const x = ((d.x0 + d.x1) / 2 * 180 / Math.PI);
         const y = (d.y0 + d.y1) / 2;
-        return `rotate(${x - 90}) translate(${y},0) rotate(${x > 180 && x < 360 ? 180 : 0})`;
+        const offset = ((-d.y0 + d.y1) -size.width)/2 - 5;
+        console.log(`LT: rotate(${x - 90}) translate(${ size.width > (-d.y0 + d.y1) ? ( x > 180 && x < 360 ? y + offset : y - offset ): y},0) rotate(${x > 180 && x < 360 ? 180 : 0})`)
+        console.log(`LT: Making Transform of ${label}`)
+        return `rotate(${x - 90}) translate(${ size.width > (-d.y0 + d.y1) ? ( x > 180 && x < 360 ? y + offset : y - offset ): y},0) rotate(${x > 180 && x < 360 ? 180 : 0})`;
     }
     function textSize(someText) {
         if (!d3) return;
