@@ -195,7 +195,7 @@ export function drawContent() {
         })
             .transition().duration(ctx.AnimDuration)
             .attr("fill-opacity", d => +labelVisible(d.target, d.data.data.key))
-            .attrTween("transform", d => () => labelTransform(d.current, d.data.data.key))
+            .attrTween("transform", d => () => (d.data.id == target.data.id) ? `` : labelTransform(d.current, d.data.data.key))
     }
 
     // #### TOOLTIP ####
