@@ -15,9 +15,9 @@
           "description": "Sunburst Visualization",
           "iconUrl": "https://storage.cloud.google.com/dscv/public/images/suburst-icon.png",
           "resource": {
-              "js": "gs://dscv-staples-sunburst/sunburst/sunburst.js",
-              "config": "gs://dscv-staples-sunburst/sunburst/sunburst.json",
-              "css": "gs://dscv-staples-sunburst/sunburst/sunburst.css"
+              "js": "gs://dscv-staples-sunburst/sunburstDev/sunburst.js",
+              "config": "gs://dscv-staples-sunburst/sunburstDev/sunburst.json",
+              "css": "gs://dscv-staples-sunburst/sunburstDev/sunburst.css"
           }
       }
   ]
